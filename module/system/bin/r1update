@@ -1,0 +1,41 @@
+#!/bin/sh
+
+# Check if script is running as root
+if [ "$(id -u)" -ne 0 ]; then
+    echo "This script must be run as root."
+    exit 1
+fi
+
+# Define variables
+r1_system_updater="/sdcard/.r1-DO-NOT-DELETE/update/updater.apk"
+r1_launcher="/sdcard/.r1-DO-NOT-DELETE/update/launcher.apk"
+
+# Function to check if file exists
+check_file_existence() {
+    if [ ! -f "$1" ]; then
+        echo "File $1 does not exist. You need to extract all the files in the update.zip in /sdcard/.r1-DO-NOT-DELETE/update"
+        exit 1
+    fi
+}
+
+# Check if all files exist
+check_file_existence "$r1_system_updater"
+check_file_existence "$r1_launcher"
+echo "Updating the launcher"
+# Replace system files
+if [ -f "/system/app/tech.rabbit.r1launcher.r2/base.apk" ]; then
+    cp "$r1_launcher" "/system/app/tech.rabbit.r1launcher.r2/base.apk"
+    echo "Updated the launcher"
+else
+    echo "Failed to update the launcher"
+fi
+
+if [ -f "/system/app/tech.rabbit.r1systemupdates/base.apk" ]; then
+    cp "$r1_system_updater" "/system/app/tech.rabbit.r1systemupdates/base.apk"
+    echo "Updated the updater"
+else
+    echo "Failed to update the updater"
+fi
+
+echo "Rebooting"
+reboot
