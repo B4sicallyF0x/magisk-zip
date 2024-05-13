@@ -1,0 +1,69 @@
+#!/system/bin/sh
+#
+# If this blows up your system or somehow runs rm -rf / then do not blame the developers
+# this file was made by ChatGPT
+#
+
+echo "Generating a new IMEI"
+echo "If this script doesn't work, try running it with root"
+
+# Function to calculate checksum
+calculate_checksum() {
+    local imeiWithoutChecksum="$1"
+    local sum=0
+    local double=false
+    local i=0
+    local length=${#imeiWithoutChecksum}
+    
+    while [ $i -lt $length ]; do
+        local digit=${imeiWithoutChecksum:$i:1}
+        if [ "$double" = true ]; then
+            digit=$((digit * 2))
+            if [ "$digit" -gt 9 ]; then
+                digit=$((digit - 9))
+            fi
+        fi
+        sum=$((sum + digit))
+        if [ "$double" = true ]; then
+            double=false
+        else
+            double=true
+        fi
+        i=$((i + 1))
+    done
+    
+    local checksum=$((10 - (sum % 10)))
+    echo "$checksum"
+}
+
+# Function to generate IMEI
+generate_imei() {
+    local TAC="35847631"
+    local serialNumberPrefix="00"
+    local serialNumber="$serialNumberPrefix"
+    local i=0
+    
+    while [ $i -lt 4 ]; do
+        serialNumber="$serialNumber$((RANDOM % 10))"
+        i=$((i + 1))
+    done
+    
+    local imeiWithoutChecksum="$TAC$serialNumber"
+    local checksum=$(calculate_checksum "$imeiWithoutChecksum")
+    local generatedIMEI="$imeiWithoutChecksum$checksum"
+    echo "$generatedIMEI"
+}
+
+# Create directory if it doesn't exist
+mkdir -p "/sdcard/.r1-DO-NOT-DELETE/"
+
+# Remove existing IMEI file if it exists
+if [ -f "/sdcard/.r1-DO-NOT-DELETE/imei.txt" ]; then
+    rm "/sdcard/.r1-DO-NOT-DELETE/imei.txt"
+fi
+
+# Generate and save IMEI
+imei=$(generate_imei)
+echo "$imei" > "/sdcard/.r1-DO-NOT-DELETE/imei.txt"
+
+echo "Successfully generated a new IMEI"

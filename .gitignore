@@ -1,0 +1,4 @@
+*.tar
+*.zip
+_MACOSX
+.vs
