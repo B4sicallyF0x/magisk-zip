@@ -24,17 +24,18 @@ case "$user_input" in
     echo "Deleting. Device will reboot once data has been deleted"
     rm -rf "/data/data/tech.rabbit.r1systemupdater"
     rm -rf "/data/data/tech.rabbit.r1launcher.r2"
+    rm -rf "/sdcard/.r1-DO-NOT-DELETE"
     reboot
     ;;
   2)
-    echo "Not yet implemented"
+    am start -a android.intent.action.VIEW -d 'https://github.com/Rabbit-Reborn/magisk-zip/releases/latest'
     exit
     ;;
   3)
-    if [ -f "/system/bin/r1imei" ]; then
-      sh /system/bin/r1imei
+    if [ -f "/system/xbin/r1imei" ]; then
+      sh /system/xbin/r1imei
     else
-      echo "[!] IMEI generator script not found in /system/bin/r1imei"
+      echo "[!] IMEI generator script not found in /system/xbin/r1imei"
       exit 1
     fi
     ;;
