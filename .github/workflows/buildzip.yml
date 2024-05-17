@@ -20,14 +20,6 @@ jobs:
       - name: Run Build Script
         run: ./build.sh
 
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: Rabbit\ R1\ Launcher.zip
-          asset_name: Rabbit_R1_Launcher.zip
-          asset_content_type: application/zip
-
       - name: Set Body
         id: set_body
         run: |
@@ -39,6 +31,7 @@ jobs:
 
       - name: Create Release
         id: create_release
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -48,3 +41,11 @@ jobs:
           body: ${{ steps.set_body.outputs.body }}
           draft: false
           prerelease: ${{ steps.prerelease_status.outputs.prerelease }}
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: Rabbit\ R1\ Launcher.zip
+          asset_name: Rabbit_R1_Launcher.zip
+          asset_content_type: application/zip
