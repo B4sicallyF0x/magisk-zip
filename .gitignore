@@ -3,3 +3,5 @@
 _MACOSX
 .vs
 .DS_Store
+module/.DS_Store
+module/system/app/tech.rabbit.r1launcher.r2/lib/.DS_Store
