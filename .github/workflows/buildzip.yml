@@ -1,0 +1,50 @@
+on:
+  push:
+    tags:
+      - 'v*'
+
+name: Create Release
+
+jobs:
+  build:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Determine Pre-release status
+        id: prerelease_status
+        run: echo ::set-output name=prerelease::$(echo "${{ github.ref }}" | grep -o -E "[-]([a-zA-Z]+)$" || echo "false")
+
+      - name: Run Build Script
+        run: ./build.sh
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: Rabbit\ R1\ Launcher.zip
+          asset_name: Rabbit_R1_Launcher.zip
+          asset_content_type: application/zip
+
+      - name: Set Body
+        id: set_body
+        run: |
+          if [ "${{ steps.prerelease_status.outputs.prerelease }}" == "true" ]; then
+            echo "::set-output name=body::**Release not recommended to use on your main devices**"
+          else
+            echo "::set-output name=body::"
+          fi
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          body: ${{ steps.set_body.outputs.body }}
+          draft: false
+          prerelease: ${{ steps.prerelease_status.outputs.prerelease }}
