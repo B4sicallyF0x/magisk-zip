@@ -29,7 +29,7 @@ jobs:
 
       - name: Determine Pre-release status
         id: prerelease_status
-        run: echo ::set-output name=prerelease::$(echo "${{ github.ref }}" | grep -o -E "[-]([a-zA-Z]+)$" || echo "false")
+        run: echo "::set-output name=prerelease::$(echo "${{ github.ref }}" | grep -o -E "[-]([a-zA-Z]+)$" || echo "false")"
 
       - name: Run Build Script
         run: ./build.sh
@@ -43,6 +43,10 @@ jobs:
             echo "::set-output name=body::"
           fi
 
+      - name: Get Tag Name
+        id: extract_tag
+        run: echo "::set-output name=tag::${GITHUB_REF#refs/tags/}"
+
       - name: Create Release
         id: create_release
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
@@ -50,8 +54,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
+          tag_name: ${{ steps.extract_tag.outputs.tag }}
+          release_name: ${{ steps.extract_tag.outputs.tag }}
           body: ${{ steps.set_body.outputs.body }}
           draft: false
           prerelease: ${{ steps.prerelease_status.outputs.prerelease }}
