@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# Check if script is running as root
+if [ "$(id -u)" -ne 0 ]; then
+  echo "[!] This script may not work properly without root"
+  exit 1
+fi
+
 # Check files
 if [ ! -f "/system/app/tech.rabbit.r1launcher.r2" ]; then
   echo "[!] Rabbit R1 launcher not found"
@@ -18,6 +24,7 @@ echo "[1] Delete all launcher data"
 echo "[2] Download the latest version of the module"
 echo "[3] IMEI Generator"
 
+read -p "Enter your choice: " user_input
 
 case "$user_input" in
   1)
