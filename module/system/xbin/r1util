@@ -1,0 +1,45 @@
+#!/bin/sh
+
+# Check files
+if [ ! -f "/system/app/tech.rabbit.r1launcher.r2" ]; then
+  echo "[!] Rabbit R1 launcher not found"
+  exit 1
+fi
+
+if [ ! -f "/system/xbin/r1imei" ]; then
+  echo "[!] IMEI generator not found, exiting..."
+  exit 1
+fi
+
+echo "R1 utilities"
+echo "Made by Proton0"
+
+echo "[1] Delete all launcher data"
+echo "[2] Download the latest version of the module"
+echo "[3] IMEI Generator"
+
+
+case "$user_input" in
+  1)
+    echo "Deleting. Device will reboot once data has been deleted"
+    rm -rf "/data/data/tech.rabbit.r1systemupdater"
+    rm -rf "/data/data/tech.rabbit.r1launcher.r2"
+    reboot
+    ;;
+  2)
+    echo "Not yet implemented"
+    exit
+    ;;
+  3)
+    if [ -f "/system/bin/r1imei" ]; then
+      sh /system/bin/r1imei
+    else
+      echo "[!] IMEI generator script not found in /system/bin/r1imei"
+      exit 1
+    fi
+    ;;
+  *)
+    echo "Invalid input, exiting..."
+    exit 1
+    ;;
+esac
