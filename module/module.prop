@@ -1,6 +1,6 @@
-id=r1launcher
-name=Rabbit R1 Launcher
-version=1.2
-versionCode=1.2
+id=r1installer
+name=Rabbit R1 Installer
+version=v1.2.2
+versionCode=2
 author=Proton0
-description=Rabbit R1 Launcher
+description=Rabbit R1 Installer
