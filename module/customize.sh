@@ -43,7 +43,6 @@ REPLACE="
 ##########################################################################################
 
 set_permissions() {
-  set_perm_recursive $MODPATH/system/bin 0 0 0755 0644
   set_perm $MODPATH/system/bin/r1imei 0 0 0755 0644
   set_perm $MODPATH/system/bin/r1util 0 0 0755 0644
   set_perm_recursive $MODPATH/system/tech.rabbit.r1launcher.r2 0 0 0755 0644
