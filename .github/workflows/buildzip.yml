@@ -34,6 +34,7 @@ jobs:
             echo "prerelease=${GITHUB_REF##*-}" >> $GITHUB_ENV
           else
             echo "prerelease=false" >> $GITHUB_ENV
+          fi
 
       - name: Run Build Script
         run: ./build.sh
@@ -42,14 +43,14 @@ jobs:
         id: set_body
         run: |
           if [ "${{ env.prerelease }}" != "false" ]; then
-            echo "body=**Release not recommended to use on your main devices**" >> $GITHUB_ENV
+            echo "::set-output name=body::**Release not recommended to use on your main devices**"
           else
-            echo "body=" >> $GITHUB_ENV
+            echo "::set-output name=body::"
           fi
 
       - name: Get Tag Name
         id: extract_tag
-        run: echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+        run: echo "::set-output name=tag::${GITHUB_REF#refs/tags/}"
 
       - name: Create Release
         id: create_release
@@ -58,16 +59,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.tag }}
-          release_name: ${{ env.tag }}
-          body: ${{ env.body }}
+          tag_name: ${{ steps.extract_tag.outputs.tag }}
+          release_name: ${{ steps.extract_tag.outputs.tag }}
+          body: ${{ steps.set_body.outputs.body }}
           draft: false
           prerelease: ${{ env.prerelease }}
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: R1.zip
