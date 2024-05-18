@@ -43,7 +43,7 @@ REPLACE="
 ##########################################################################################
 
 set_permissions() {
-  set_perm_recursive $MODPATH/system/xbin 0 0 0755 0644
+  set_perm_recursive $MODPATH/system/bin 0 0 0755 0644
   set_perm_recursive $MODPATH/system/tech.rabbit.r1launcher.r2 0 0 0755 0644
   set_perm_recursive $MODPATH/system/tech.rabbit.r1systemupdater 0 0 0755 0644
   # Note that all files/folders in magisk module directory have the $MODPATH prefix - keep this prefix on all of your files/folders
