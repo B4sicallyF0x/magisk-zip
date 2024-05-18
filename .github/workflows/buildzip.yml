@@ -29,7 +29,11 @@ jobs:
 
       - name: Determine Pre-release status
         id: prerelease_status
-        run: echo "::set-output name=prerelease::$(echo "${{ github.ref }}" | grep -o -E "[-]([a-zA-Z]+)$" || echo "false")"
+        run: |
+          if [[ "${GITHUB_REF}" =~ - ]]; then
+            echo "prerelease=${GITHUB_REF##*-}" >> $GITHUB_ENV
+          else
+            echo "prerelease=false" >> $GITHUB_ENV
 
       - name: Run Build Script
         run: ./build.sh
@@ -37,15 +41,15 @@ jobs:
       - name: Set Body
         id: set_body
         run: |
-          if [ "${{ steps.prerelease_status.outputs.prerelease }}" == "true" ]; then
-            echo "::set-output name=body::**Release not recommended to use on your main devices**"
+          if [ "${{ env.prerelease }}" != "false" ]; then
+            echo "body=**Release not recommended to use on your main devices**" >> $GITHUB_ENV
           else
-            echo "::set-output name=body::"
+            echo "body=" >> $GITHUB_ENV
           fi
 
       - name: Get Tag Name
         id: extract_tag
-        run: echo "::set-output name=tag::${GITHUB_REF#refs/tags/}"
+        run: echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
       - name: Create Release
         id: create_release
@@ -54,14 +58,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.extract_tag.outputs.tag }}
-          release_name: ${{ steps.extract_tag.outputs.tag }}
-          body: ${{ steps.set_body.outputs.body }}
+          tag_name: ${{ env.tag }}
+          release_name: ${{ env.tag }}
+          body: ${{ env.body }}
           draft: false
-          prerelease: ${{ steps.prerelease_status.outputs.prerelease }}
+          prerelease: ${{ env.prerelease }}
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: R1.zip
